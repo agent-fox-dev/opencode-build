@@ -25,11 +25,35 @@ opencode:
 		containers/opencode/
 	@echo "✅ Opencode image built: $(OPENCODE_IMAGE):$(TAG)"
 
+# run the opencode image
+run:
+	@echo "🔨 Running opencode image..."
+	source .env && \
+	$(CONTAINER_TOOL) run -d \
+		--name opencode \
+		-p 4096:4096 \
+		-v ./data/data:/opt/app-root/data \
+		-v ./data/state:/opt/app-root/state \
+		-v ./data/config:/opt/app-root/config \
+		-v ./data/cache:/opt/app-root/cache \
+		-e TZ="${TZ}" \
+		-e OPENCODE_SERVER_USERNAME="${OPENCODE_SERVER_USERNAME}" \
+		-e OPENCODE_SERVER_PASSWORD="${OPENCODE_SERVER_PASSWORD}" \
+		$(OPENCODE_IMAGE):$(TAG)
+	@echo "✅ Opencode image running"
+
 # Clean up any configuration files
 clean-config:
 	@echo "🧹 Cleaning up configuration files..."
-	rm -rf data/share data/state data/config
+	rm -rf data/data data/state data/config data/cache
 	@echo "✅ Configuration files cleaned"
+
+create-config:
+	@echo "🧹 Creating configuration files..."
+	mkdir -p data/data/opencode data/state data/config/opencode data/cache
+	cp hack/auth.json ./data/data/opencode/auth.json
+	cp hack/opencode.jsonc ./data/config/opencode/opencode.jsonc
+	@echo "✅ Configuration files created"
 
 # Clean up locally built images
 clean-images:

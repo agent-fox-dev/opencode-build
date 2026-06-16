@@ -1,13 +1,15 @@
 #FROM node:24.15.0-bookworm
 FROM registry.redhat.io/ubi10/nodejs-24:latest
 
-ENV OPENCODE_VERSION=1.17.7
-
-# set working directory
-WORKDIR ${APP_ROOT}
+ENV OPENCODE_VERSION=1.17.7 \
+    OPENCODE_PORT=4096 \
+    OPENCODE_HOSTNAME=0.0.0.0 \
+    OPENCODE_MODE=web
 
 RUN OPENCODE_INSTALL_DIR=${APP_ROOT} \
     curl -fsSL https://opencode.ai/install | bash -s -- --version ${OPENCODE_VERSION}
+    
+COPY run /usr/local/bin/run
 
 ENV PATH=${APP_ROOT}/src/.opencode/bin:$PATH \
     OPENCODE_DB=${APP_ROOT}/data/opencode.db \
@@ -24,12 +26,10 @@ RUN mkdir -p ${APP_ROOT}/data && \
     mkdir -p ${APP_ROOT}/cache && \
     chown -R 1001:0 ${APP_ROOT} && chmod -R ug+rwx ${APP_ROOT}
 
+# set working directory
+WORKDIR ${APP_ROOT}/src
+
 # set the user to 1001
 USER 1001
-
-# create necessary directories and set permissions
-#RUN mkdir -p /home/opencode/.local/share/opencode/ && \
-#  mkdir -p /home/opencode/.local/state/opencode && \
-#  mkdir -p /home/opencode/.config/opencode/ && \
-#  chown -R opencode:opencode /home/opencode
-
+EXPOSE ${OPENCODE_PORT}
+CMD ["/usr/local/bin/run"]

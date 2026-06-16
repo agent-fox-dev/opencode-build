@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+if [ -n "${GIT_REPO}" ]; then
+    git clone "${GIT_REPO}" "${APP_ROOT}/workspace"
+
+    if [ -n "${GIT_REV}" ]; then
+        git -C "${APP_ROOT}/src" checkout "${GIT_REV}"
+    elif [ -n "${GIT_BRANCH}" ]; then
+        git -C "${APP_ROOT}/src" checkout "${GIT_BRANCH}"
+    fi
+else
+    mkdir -p "${APP_ROOT}/workspace"
+    git init "${APP_ROOT}/workspace"
+fi
+
+cd "${APP_ROOT}/src"
+opencode ${OPENCODE_MODE} --hostname ${OPENCODE_HOSTNAME} --port ${OPENCODE_PORT}
