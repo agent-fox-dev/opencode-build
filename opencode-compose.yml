@@ -1,0 +1,21 @@
+services:
+  opencode:
+    image: quay.io/agentfox/opencode:latest
+    container_name: opencode
+
+    # listen on all interfaces INSIDE the container
+    command: opencode web --hostname 0.0.0.0 --port 4096
+
+    ports:
+      - "4096:4096"
+
+    volumes:
+      - ./data/data:/opt/app-root/data
+      - ./data/state:/opt/app-root/state
+      - ./data/config:/opt/app-root/config
+      - ./data/cache:/opt/app-root/cache
+
+    environment:
+      - TZ=${TZ}
+      - OPENCODE_SERVER_USERNAME=${OPENCODE_SERVER_USERNAME}
+      - OPENCODE_SERVER_PASSWORD=${OPENCODE_SERVER_PASSWORD}

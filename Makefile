@@ -1,0 +1,45 @@
+# Build container images locally using Podman
+
+# Default registry and namespace
+REGISTRY ?= quay.io
+NAMESPACE ?= agentfox
+
+# Image names and tags
+OPENCODE_IMAGE = $(REGISTRY)/$(NAMESPACE)/opencode
+TAG ?= latest
+
+# Build tool
+CONTAINER_TOOL ?= podman
+
+# Build arguments
+BUILD_ARGS ?= --build-arg TARGETARCH=$(shell uname -m | sed 's/x86_64/amd64/')
+
+.PHONY: help all build-all opencode clean clean-all push-all
+
+# Build the opencode image
+opencode:
+	@echo "🔨 Building opencode image..."
+	$(CONTAINER_TOOL) build $(BUILD_ARGS) \
+		-f containers/opencode/Containerfile \
+		-t $(OPENCODE_IMAGE):$(TAG) \
+		containers/opencode/
+	@echo "✅ Opencode image built: $(OPENCODE_IMAGE):$(TAG)"
+
+# Clean up any configuration files
+clean-config:
+	@echo "🧹 Cleaning up configuration files..."
+	rm -rf data/share data/state data/config
+	@echo "✅ Configuration files cleaned"
+
+# Clean up locally built images
+clean-images:
+	@echo "🧹 Cleaning up locally built images..."
+	-$(CONTAINER_TOOL) rmi $(OPENCODE_IMAGE):$(TAG) 2>/dev/null || true
+	@echo "✅ Local images cleaned"
+
+# Clean up all related images including base images and any configuration files
+clean-all: clean-config clean-images
+	@echo "🧹 Cleaning up all related images..."
+	-$(CONTAINER_TOOL) system prune -f 2>/dev/null || true
+	@echo "✅ All images cleaned"
+
