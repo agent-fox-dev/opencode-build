@@ -1,0 +1,21 @@
+name: build the opencode container
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - 'main'
+  push:
+    branches:
+      - 'main'
+jobs:
+  build-runtime-container:
+    uses: ./.github/workflows/build.yaml
+    with:
+      container_name: opencode
+    secrets: inherit
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
+      attestations: write
