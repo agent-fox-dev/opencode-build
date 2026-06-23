@@ -14,13 +14,13 @@ RUN ARCH=$(echo ${TARGETARCH} | sed 's/amd64/x64/;s/arm64/arm64/') && \
     DOWNLOAD_URL="https://github.com/${OPENCODE_FORK_REPO}/releases/download/${RELEASE_TAG}/${FILENAME}" && \
     echo "Downloading opencode from ${DOWNLOAD_URL}" && \
     curl -fsSL -o /tmp/opencode.tar.gz "${DOWNLOAD_URL}" && \
-    mkdir -p ${APP_ROOT}/bin && \
-    tar xzf /tmp/opencode.tar.gz -C /tmp && \
-    mv /tmp/bin/opencode ${APP_ROOT}/bin/opencode && \
+    mkdir -p ${APP_ROOT}/bin /tmp/opencode-extract && \
+    tar xzf /tmp/opencode.tar.gz -C /tmp/opencode-extract && \
+    mv /tmp/opencode-extract/bin/opencode ${APP_ROOT}/bin/opencode && \
     chmod 755 ${APP_ROOT}/bin/opencode && \
-    rm -rf /tmp/opencode.tar.gz /tmp/bin /tmp/package.json
+    rm -rf /tmp/opencode.tar.gz /tmp/opencode-extract
 
-COPY run /usr/local/bin/run
+COPY ./containers/opencode/run /usr/local/bin/run
 
 ENV PATH=${APP_ROOT}/bin:$PATH \
     OPENCODE_DB=${APP_ROOT}/data/opencode.db \
