@@ -22,7 +22,7 @@ opencode:
 	$(CONTAINER_TOOL) build $(BUILD_ARGS) \
 		-f containers/opencode/Containerfile \
 		-t $(OPENCODE_IMAGE):$(TAG) \
-		containers/opencode/
+		.
 	@echo "✅ Opencode image built: $(OPENCODE_IMAGE):$(TAG)"
 
 # run the opencode image

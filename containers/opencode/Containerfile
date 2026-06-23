@@ -20,7 +20,7 @@ RUN ARCH=$(echo ${TARGETARCH} | sed 's/amd64/x64/;s/arm64/arm64/') && \
     chmod 755 ${APP_ROOT}/bin/opencode && \
     rm -rf /tmp/opencode.tar.gz /tmp/bin /tmp/package.json
 
-COPY run /usr/local/bin/run
+COPY containers/opencode/run /usr/local/bin/run
 
 ENV PATH=${APP_ROOT}/bin:$PATH \
     OPENCODE_DB=${APP_ROOT}/data/opencode.db \
