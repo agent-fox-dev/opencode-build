@@ -1,17 +1,28 @@
 #FROM node:24.15.0-bookworm
 FROM registry.redhat.io/ubi10/nodejs-24:latest
 
-ENV OPENCODE_VERSION=1.17.7 \
-    OPENCODE_PORT=4096 \
+ARG TARGETARCH=x64
+ARG OPENCODE_FORK_REPO=agent-fox-dev/opencode
+
+ENV OPENCODE_PORT=4096 \
     OPENCODE_HOSTNAME=0.0.0.0 \
     OPENCODE_MODE=web
 
-RUN OPENCODE_INSTALL_DIR=${APP_ROOT} \
-    curl -fsSL https://opencode.ai/install | bash -s -- --version ${OPENCODE_VERSION}
-    
+RUN ARCH=$(echo ${TARGETARCH} | sed 's/amd64/x64/;s/arm64/arm64/') && \
+    RELEASE_TAG=$(curl -fsSL "https://api.github.com/repos/${OPENCODE_FORK_REPO}/releases/latest" | grep '"tag_name"' | cut -d'"' -f4) && \
+    FILENAME="opencode-linux-${ARCH}.tar.gz" && \
+    DOWNLOAD_URL="https://github.com/${OPENCODE_FORK_REPO}/releases/download/${RELEASE_TAG}/${FILENAME}" && \
+    echo "Downloading opencode from ${DOWNLOAD_URL}" && \
+    curl -fsSL -o /tmp/opencode.tar.gz "${DOWNLOAD_URL}" && \
+    mkdir -p ${APP_ROOT}/bin && \
+    tar xzf /tmp/opencode.tar.gz -C /tmp && \
+    mv /tmp/bin/opencode ${APP_ROOT}/bin/opencode && \
+    chmod 755 ${APP_ROOT}/bin/opencode && \
+    rm -rf /tmp/opencode.tar.gz /tmp/bin /tmp/package.json
+
 COPY run /usr/local/bin/run
 
-ENV PATH=${APP_ROOT}/src/.opencode/bin:$PATH \
+ENV PATH=${APP_ROOT}/bin:$PATH \
     OPENCODE_DB=${APP_ROOT}/data/opencode.db \
     XDG_DATA_HOME=${APP_ROOT}/data \
     XDG_CONFIG_HOME=${APP_ROOT}/config \

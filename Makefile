@@ -12,7 +12,7 @@ TAG ?= latest
 CONTAINER_TOOL ?= podman
 
 # Build arguments
-BUILD_ARGS ?= --build-arg TARGETARCH=$(shell uname -m | sed 's/x86_64/amd64/')
+BUILD_ARGS ?= --build-arg TARGETARCH=$(shell uname -m | sed 's/x86_64/x64/;s/aarch64/arm64/')
 
 .PHONY: help all build-all opencode clean clean-all push-all
 
