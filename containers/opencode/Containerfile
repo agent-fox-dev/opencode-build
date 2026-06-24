@@ -1,14 +1,15 @@
 #FROM node:24.15.0-bookworm
 FROM registry.redhat.io/ubi10/nodejs-24:latest
 
-ARG TARGETARCH=x64
+ARG TARGETARCH
 ARG OPENCODE_FORK_REPO=agent-fox-dev/opencode
 
 ENV OPENCODE_PORT=4096 \
     OPENCODE_HOSTNAME=0.0.0.0 \
     OPENCODE_MODE=web
 
-RUN ARCH=$(echo ${TARGETARCH} | sed 's/amd64/x64/;s/arm64/arm64/') && \
+RUN ARCH=$(echo ${TARGETARCH} | sed 's/amd64/x64/') && \
+    echo "Building for TARGETARCH=${TARGETARCH} (release arch: ${ARCH})" && \
     RELEASE_TAG=$(curl -fsSL "https://api.github.com/repos/${OPENCODE_FORK_REPO}/releases/latest" | grep '"tag_name"' | cut -d'"' -f4) && \
     FILENAME="opencode-linux-${ARCH}.tar.gz" && \
     DOWNLOAD_URL="https://github.com/${OPENCODE_FORK_REPO}/releases/download/${RELEASE_TAG}/${FILENAME}" && \
