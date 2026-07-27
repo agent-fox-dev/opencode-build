@@ -2,7 +2,7 @@
 FROM registry.redhat.io/ubi10/nodejs-24:latest
 
 ARG TARGETARCH
-ARG OPENCODE_FORK_REPO=agent-fox-dev/opencode
+ARG OPENCODE_FORK_REPO=anomalyco/opencode #agent-fox-dev/opencode
 
 ENV OPENCODE_PORT=4096 \
     OPENCODE_HOSTNAME=0.0.0.0 \
