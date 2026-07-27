@@ -3,6 +3,7 @@ FROM registry.redhat.io/ubi10/nodejs-24:latest
 
 ARG TARGETARCH
 ARG OPENCODE_FORK_REPO=anomalyco/opencode #agent-fox-dev/opencode
+ARG OPENCODE_VERSION=latest
 
 ENV OPENCODE_PORT=4096 \
     OPENCODE_HOSTNAME=0.0.0.0 \
@@ -17,7 +18,7 @@ RUN ARCH=$(echo ${TARGETARCH} | sed 's/amd64/x64/') && \
     curl -fsSL -o /tmp/opencode.tar.gz "${DOWNLOAD_URL}" && \
     mkdir -p ${APP_ROOT}/bin /tmp/opencode-extract && \
     tar xzf /tmp/opencode.tar.gz -C /tmp/opencode-extract && \
-    mv /tmp/opencode-extract/bin/opencode ${APP_ROOT}/bin/opencode && \
+    mv /tmp/opencode-extract/opencode ${APP_ROOT}/bin/opencode && \
     chmod 755 ${APP_ROOT}/bin/opencode && \
     rm -rf /tmp/opencode.tar.gz /tmp/opencode-extract
 
@@ -45,3 +46,4 @@ WORKDIR ${APP_ROOT}/src
 USER 1001
 EXPOSE ${OPENCODE_PORT}
 CMD ["/usr/local/bin/run"]
+
