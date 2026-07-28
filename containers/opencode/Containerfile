@@ -1,5 +1,6 @@
-#FROM node:24.15.0-bookworm
-FROM registry.redhat.io/ubi10/nodejs-24:latest
+FROM ghcr.io/rhadp/codespaces:latest
+
+USER root
 
 ARG TARGETARCH
 ARG OPENCODE_FORK_REPO=anomalyco/opencode #agent-fox-dev/opencode
@@ -25,25 +26,24 @@ RUN ARCH=$(echo ${TARGETARCH} | sed 's/amd64/x64/') && \
 COPY ./containers/opencode/run /usr/local/bin/run
 
 ENV PATH=${APP_ROOT}/bin:$PATH \
-    OPENCODE_DB=${APP_ROOT}/data/opencode.db \
-    XDG_DATA_HOME=${APP_ROOT}/data \
-    XDG_CONFIG_HOME=${APP_ROOT}/config \
-    XDG_STATE_HOME=${APP_ROOT}/state \
-    XDG_CACHE_HOME=${APP_ROOT}/cache
+    OPENCODE_DB=${APP_ROOT}/opencode/data/opencode.db \
+    XDG_DATA_HOME=${APP_ROOT}/opencode/data \
+    XDG_CONFIG_HOME=${APP_ROOT}/opencode/config \
+    XDG_STATE_HOME=${APP_ROOT}/opencode/state \
+    XDG_CACHE_HOME=${APP_ROOT}/opencode/cache
 
 RUN opencode --help
 
-RUN mkdir -p ${APP_ROOT}/data && \
-    mkdir -p ${APP_ROOT}/config && \
-    mkdir -p ${APP_ROOT}/state && \
-    mkdir -p ${APP_ROOT}/cache && \
-    chown -R 1001:0 ${APP_ROOT} && chmod -R ug+rwx ${APP_ROOT}
+RUN mkdir -p ${APP_ROOT}/opencode/data \
+        ${APP_ROOT}/opencode/config \
+        ${APP_ROOT}/opencode/state \
+        ${APP_ROOT}/opencode/cache \
+        /projects && \
+    chgrp -R 0 ${APP_ROOT}/opencode /projects && \
+    chmod -R g=u ${APP_ROOT}/opencode /projects
 
-# set working directory
-WORKDIR ${APP_ROOT}/src
+WORKDIR /projects
 
-# set the user to 1001
-USER 1001
+USER 10001
 EXPOSE ${OPENCODE_PORT}
 CMD ["/usr/local/bin/run"]
-
