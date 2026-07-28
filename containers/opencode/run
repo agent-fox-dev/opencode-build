@@ -14,5 +14,5 @@ else
     git init "${APP_ROOT}/workspace"
 fi
 
-cd "${APP_ROOT}/src"
+cd "/projects"
 opencode ${OPENCODE_MODE} --hostname ${OPENCODE_HOSTNAME} --port ${OPENCODE_PORT}
