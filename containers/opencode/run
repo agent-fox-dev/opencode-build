@@ -2,16 +2,17 @@
 set -e
 
 if [ -n "${GIT_REPO}" ]; then
-    git clone "${GIT_REPO}" "${APP_ROOT}/workspace"
+    if [ ! -d "/projects/.git" ]; then
+        git clone "${GIT_REPO}" "/projects"
+    fi
 
     if [ -n "${GIT_REV}" ]; then
-        git -C "${APP_ROOT}/src" checkout "${GIT_REV}"
+        git -C "/projects" checkout "${GIT_REV}"
     elif [ -n "${GIT_BRANCH}" ]; then
-        git -C "${APP_ROOT}/src" checkout "${GIT_BRANCH}"
+        git -C "/projects" checkout "${GIT_BRANCH}"
     fi
-else
-    mkdir -p "${APP_ROOT}/workspace"
-    git init "${APP_ROOT}/workspace"
+elif [ ! -d "/projects/.git" ]; then
+    git init "/projects"
 fi
 
 cd "/projects"

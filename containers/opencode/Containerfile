@@ -25,22 +25,25 @@ RUN ARCH=$(echo ${TARGETARCH} | sed 's/amd64/x64/') && \
 
 COPY ./containers/opencode/run /usr/local/bin/run
 
+# opencode namespaces its own subfolder under each XDG_*_HOME (see
+# packages/core/src/global.ts), so these must NOT already contain an
+# "opencode" segment or its data ends up double-nested at .../opencode/opencode.
 ENV PATH=${APP_ROOT}/bin:$PATH \
-    OPENCODE_DB=${APP_ROOT}/opencode/data/opencode.db \
-    XDG_DATA_HOME=${APP_ROOT}/opencode/data \
-    XDG_CONFIG_HOME=${APP_ROOT}/opencode/config \
-    XDG_STATE_HOME=${APP_ROOT}/opencode/state \
-    XDG_CACHE_HOME=${APP_ROOT}/opencode/cache
+    OPENCODE_DB=${APP_ROOT}/data/opencode.db \
+    XDG_DATA_HOME=${APP_ROOT}/data \
+    XDG_CONFIG_HOME=${APP_ROOT}/config \
+    XDG_STATE_HOME=${APP_ROOT}/state \
+    XDG_CACHE_HOME=${APP_ROOT}/cache
 
 RUN opencode --help
 
-RUN mkdir -p ${APP_ROOT}/opencode/data \
-        ${APP_ROOT}/opencode/config \
-        ${APP_ROOT}/opencode/state \
-        ${APP_ROOT}/opencode/cache \
+RUN mkdir -p ${APP_ROOT}/data \
+        ${APP_ROOT}/config \
+        ${APP_ROOT}/state \
+        ${APP_ROOT}/cache \
         /projects && \
-    chgrp -R 0 ${APP_ROOT}/opencode /projects && \
-    chmod -R g=u ${APP_ROOT}/opencode /projects
+    chgrp -R 0 ${APP_ROOT}/data ${APP_ROOT}/config ${APP_ROOT}/state ${APP_ROOT}/cache /projects && \
+    chmod -R g=u ${APP_ROOT}/data ${APP_ROOT}/config ${APP_ROOT}/state ${APP_ROOT}/cache /projects
 
 WORKDIR /projects
 
